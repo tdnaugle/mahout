@@ -58,3 +58,15 @@ class QuMat:
     # placeholder method for use in the testing suite
     def get_final_state_vector(self):
         return self.backend_module.get_final_state_vector(self.circuit, self.backend, self.backend_config)
+
+    def encode_data_as_quantum_state(self, data_vector):
+        return self.backend_module.encode_data_as_quantum_state(self.circuit, data_vector)
+
+    def calculate_kernel(self, data_vector1, data_vector2):
+        circuit1 = self.backend_module.create_empty_circuit(len(data_vector1))
+        circuit2 = self.backend_module.create_empty_circuit(len(data_vector2))
+
+        self.backend_module.encode_data_as_quantum_state(circuit1, data_vector1)
+        self.backend_module.encode_data_as_quantum_state(circuit2, data_vector2)
+
+        return self.backend_module.calculate_kernel(circuit1, circuit2, self.backend)

@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 import qiskit
+import numpy as np
 
 def initialize_backend(backend_config):
     backend_options = backend_config['backend_options']
@@ -86,3 +87,19 @@ def get_final_state_vector(circuit, backend, backend_config):
     result = job.result()
 
     return result.get_statevector()
+
+def encode_data_as_quantum_state(circuit, data_vector):
+    num_qubits = len(data_vector)
+    for i in range(num_qubits):
+        angle = 2 * np.arccos(data_vector[i])
+        circuit.ry(angle, i)
+
+def calculate_kernel(circuit1, circuit2, backend):
+    # Compose the two circuits
+    combined_circuit = circuit1.compose(circuit2.inverse())
+
+    # Use the Aer simulator to calculate the inner product
+    job = qiskit.execute(combined_circuit, backend)
+    result = job.result()
+
+    return np.abs(result.get_statevector(combined_circuit)[0]) ** 2
