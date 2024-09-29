@@ -34,8 +34,6 @@ x2 = 5.84336233567701
 qk_x1_param = Parameter("x1")
 qk_x2_param = Parameter("x2")
 qk_qc = QuantumCircuit(2)
-qk_qc.h(0)
-qk_qc.h(1)
 qk_qc.rx(qk_x1_param, 0)
 qk_qc.rx(qk_x2_param, 1)
 
@@ -44,16 +42,12 @@ cq_x1_param= sympy.Symbol('x1')
 cq_x2_param = sympy.Symbol('x2')
 q0, q1 = cirq.LineQubit.range(2)
 cq_qc = cirq.Circuit(
-    cirq.H(q0),
-    cirq.H(q1),
     cirq.rx(cq_x1_param)(q0),
     cirq.rx(cq_x2_param)(q1)
 )
 
 # bra ket
 bk_qc = Circuit()
-bk_qc.h(0)
-bk_qc.h(1)
 bk_qc.rx(0, angle=x1) # error when using sympy symbol as a parameter
 bk_qc.rx(1, angle=x2) # error when using sympy symbol as a parameter
 
