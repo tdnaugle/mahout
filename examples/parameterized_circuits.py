@@ -17,8 +17,8 @@
 import qiskit
 from qiskit.circuit import QuantumCircuit, Parameter
 import cirq
-from braket.circuits import Circuit, Gate
 from braket.devices import LocalSimulator
+from braket.circuits import Circuit, FreeParameter
 import sympy
 
 # pull data, setup parameters for two-qubit angle encoding example
@@ -47,9 +47,11 @@ cq_qc = cirq.Circuit(
 )
 
 # bra ket
+bk_x1_param = FreeParameter("x1")
+bk_x2_param = FreeParameter("x2")
 bk_qc = Circuit()
-bk_qc.rx(0, angle=x1) # error when using sympy symbol as a parameter
-bk_qc.rx(1, angle=x2) # error when using sympy symbol as a parameter
+bk_qc.rx(0, angle=bk_x1_param) # error when using sympy symbol as a parameter
+bk_qc.rx(1, angle=bk_x2_param) # error when using sympy symbol as a parameter
 
 
 # draw all three circuits to check sameness
@@ -69,7 +71,7 @@ qk_result = job.result()
 qk_final_state_vector = qk_result.get_statevector()
 
 # cirq
-cq_resolver = cirq.ParamResolver({"x1": x1, "x2": x2})
+cq_resolver = cirq.ParamResolver({cq_x1_param: x1, cq_x2_param: x2})
 cq_simulator = cirq.Simulator()
 cq_result = cq_simulator.simulate(cq_qc, param_resolver=cq_resolver)
 cq_final_state_vector = cq_result.final_state_vector
@@ -77,8 +79,10 @@ cq_final_state_vector = cq_result.final_state_vector
 # bra ket
 bk_qc.state_vector()
 bk_simulator = LocalSimulator()
-bk_result = bk_simulator.run(bk_qc, shots=0).result()
+bk_qc_bound = bk_qc.make_bound_circuit({"x1": x1, "x2": x2})
+bk_result = bk_simulator.run(bk_qc_bound, shots=0).result()
 bk_final_state_vector = bk_result.result_types[0].value
+
 
 # check final state vectors for sameness
 print(qk_final_state_vector)
